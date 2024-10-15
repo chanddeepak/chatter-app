@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
@@ -8,12 +9,9 @@ import userRoutes from "./routes/user.routes.js";
 import connectToMongoDB from "./db/connectToMongoDB.js";
 import { app, server } from "./socket/socket.js"
 
-// const app = express();
 const PORT = process.env.PORT || 8000;
 
-
-// const server = require("http").Server(app);
-// const io = require("socket.io")(server);
+const __dirname = path.resolve();
 
 dotenv.config();
 
@@ -24,33 +22,12 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes); 
 app.use("/api/users", userRoutes); 
 
-// app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-// io.on("connection", (socket) => {
-//     // Handle user connection and disconnection
-//     socket.on("join room", (roomName) => {
-//       // Join a chat room and broadcast to other users
-//       console.log('')
-//     });
-  
-//     socket.on("send message", (message) => {
-//       // Store the message in the database and broadcast it to other users
-//     });
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "/frontend/dist/index.html"));
+});
 
-//     socket.on('disconnect', () => {
-//         console.log('A user disconnected');
-//       });
-    
-//     socket.on('message', (message) => {
-//         console.log('Received message:', message);
-//         io.emit('message', message);
-//     });
-
-// });
-
-// app.get("/", (req, res) => {
-//   res.send("Hello world")
-// });
 
 server.listen(PORT, () => {
     connectToMongoDB();
